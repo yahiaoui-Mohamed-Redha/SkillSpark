@@ -263,8 +263,10 @@ try {
                     }
                     
                     // Debug: Log video details
-                    error_log("Video path: " . $video_path);
+                    error_log("Original video path: " . $video['file_path']);
+                    error_log("Processed video path: " . $video_path);
                     error_log("File exists: " . (file_exists($video_path) ? 'YES' : 'NO'));
+                    error_log("Current working directory: " . getcwd());
                 ?>
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <h2 class="text-lg font-semibold text-gray-900 mb-4">Course Video</h2>
@@ -272,10 +274,12 @@ try {
                         <!-- Debug Information -->
                         <div class="mb-4 p-3 bg-yellow-100 rounded-lg text-sm">
                             <strong>Debug Info:</strong><br>
-                            Video Path: <?php echo htmlspecialchars($video_path); ?><br>
+                            Original Path: <?php echo htmlspecialchars($video['file_path']); ?><br>
+                            Processed Path: <?php echo htmlspecialchars($video_path); ?><br>
                             File Exists: <?php echo file_exists($video_path) ? 'YES' : 'NO'; ?><br>
                             File Size: <?php echo file_exists($video_path) ? filesize($video_path) . ' bytes' : 'N/A'; ?><br>
                             MIME Type: <?php echo file_exists($video_path) ? mime_content_type($video_path) : 'N/A'; ?><br>
+                            Working Directory: <?php echo getcwd(); ?><br>
                             Video URL: file_viewer.php?file=<?php echo urlencode($video_path); ?>
                         </div>
                         
