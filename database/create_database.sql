@@ -222,28 +222,58 @@ CREATE TABLE IF NOT EXISTS course_progress (
     UNIQUE KEY unique_progress (user_id, lesson_id)
 );
 
--- Playlists table
-CREATE TABLE IF NOT EXISTS playlists (
+-- Course playlists table (playlists within a course)
+CREATE TABLE IF NOT EXISTS course_playlists (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    course_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    playlist_order INT DEFAULT 1,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+
+-- Lessons table (lessons within playlists)
+CREATE TABLE IF NOT EXISTS lessons (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    course_id INT NOT NULL,
+    playlist_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    lesson_number INT NOT NULL,
+    video_url VARCHAR(500),
+    duration INT DEFAULT 0, -- in minutes
+    is_preview BOOLEAN DEFAULT FALSE,
+    is_active BOOLEAN DEFAULT TRUE,
+    lesson_order INT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+    FOREIGN KEY (playlist_id) REFERENCES course_playlists(id) ON DELETE CASCADE
+);
+
+-- User playlists table (user-created playlists)
+CREATE TABLE IF NOT EXISTS user_playlists (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    course_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     is_public BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Playlist items table
-CREATE TABLE IF NOT EXISTS playlist_items (
+-- User playlist items table
+CREATE TABLE IF NOT EXISTS user_playlist_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     playlist_id INT NOT NULL,
     course_id INT NOT NULL,
     item_order INT NOT NULL,
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE,
+    FOREIGN KEY (playlist_id) REFERENCES user_playlists(id) ON DELETE CASCADE,
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 

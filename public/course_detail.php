@@ -118,6 +118,35 @@ try {
         $comments = [];
     }
     
+    // Get playlists and lessons
+    $playlists = [];
+    try {
+        $query = "SELECT cp.*, 
+                  (SELECT COUNT(*) FROM lessons l WHERE l.playlist_id = cp.id) as lesson_count
+                  FROM course_playlists cp 
+                  WHERE cp.course_id = :course_id AND cp.is_active = 1
+                  ORDER BY cp.playlist_order, cp.created_at";
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':course_id', $course_id);
+        $stmt->execute();
+        $playlists = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Get lessons for each playlist
+        foreach ($playlists as &$playlist) {
+            $query = "SELECT * FROM lessons 
+                      WHERE course_id = :course_id AND playlist_id = :playlist_id AND is_active = 1
+                      ORDER BY lesson_order, lesson_number";
+            $stmt = $conn->prepare($query);
+            $stmt->bindParam(':course_id', $course_id);
+            $stmt->bindParam(':playlist_id', $playlist['id']);
+            $stmt->execute();
+            $playlist['lessons'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    } catch (PDOException $e) {
+        // Tables might not exist yet, continue without playlists
+        $playlists = [];
+    }
+    
 } catch (PDOException $e) {
     $error_message = 'Error loading course details: ' . $e->getMessage();
 }
@@ -232,6 +261,69 @@ try {
                             <?php endforeach; ?>
                         </div>
                     </div>
+                <?php endif; ?>
+
+                <!-- Course Playlists and Lessons -->
+                <?php if (!empty($playlists)): ?>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Course Content</h2>
+                    <div class="space-y-6">
+                        <?php foreach ($playlists as $playlist): ?>
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900"><?php echo htmlspecialchars($playlist['name']); ?></h3>
+                                    <p class="text-sm text-gray-600"><?php echo htmlspecialchars($playlist['description']); ?></p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-sm text-gray-500"><?php echo count($playlist['lessons']); ?> lessons</span>
+                                </div>
+                            </div>
+                            
+                            <?php if (!empty($playlist['lessons'])): ?>
+                            <div class="space-y-2">
+                                <?php foreach ($playlist['lessons'] as $lesson): ?>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                            <span class="text-sm font-medium text-blue-600"><?php echo $lesson['lesson_number']; ?></span>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-medium text-gray-900"><?php echo htmlspecialchars($lesson['title']); ?></h4>
+                                            <p class="text-sm text-gray-600"><?php echo htmlspecialchars($lesson['description']); ?></p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <?php if ($lesson['is_preview']): ?>
+                                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">
+                                                <i class="fas fa-eye mr-1"></i>Preview
+                                            </span>
+                                        <?php endif; ?>
+                                        <?php if ($lesson['duration'] > 0): ?>
+                                            <span class="text-sm text-gray-500">
+                                                <i class="fas fa-clock mr-1"></i><?php echo $lesson['duration']; ?> min
+                                            </span>
+                                        <?php endif; ?>
+                                        <?php if (!empty($lesson['video_url'])): ?>
+                                            <a href="<?php echo htmlspecialchars($lesson['video_url']); ?>" target="_blank" 
+                                               class="text-blue-600 hover:text-blue-800">
+                                                <i class="fas fa-play"></i>
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php else: ?>
+                            <div class="text-center py-4 text-gray-500">
+                                <i class="fas fa-book text-2xl mb-2"></i>
+                                <p>No lessons in this playlist yet</p>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
                 <?php endif; ?>
 
                 <!-- Comments Section -->

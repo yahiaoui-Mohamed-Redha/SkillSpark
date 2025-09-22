@@ -190,6 +190,61 @@ try {
             FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
         )",
         
+        // Course playlists table
+        "CREATE TABLE IF NOT EXISTS course_playlists (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            course_id INT NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            description TEXT,
+            playlist_order INT DEFAULT 1,
+            is_active BOOLEAN DEFAULT TRUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+        )",
+        
+        // Lessons table
+        "CREATE TABLE IF NOT EXISTS lessons (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            course_id INT NOT NULL,
+            playlist_id INT NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            description TEXT,
+            lesson_number INT NOT NULL,
+            video_url VARCHAR(500),
+            duration INT DEFAULT 0,
+            is_preview BOOLEAN DEFAULT FALSE,
+            is_active BOOLEAN DEFAULT TRUE,
+            lesson_order INT DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+            FOREIGN KEY (playlist_id) REFERENCES course_playlists(id) ON DELETE CASCADE
+        )",
+        
+        // User playlists table
+        "CREATE TABLE IF NOT EXISTS user_playlists (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            description TEXT,
+            is_public BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )",
+        
+        // User playlist items table
+        "CREATE TABLE IF NOT EXISTS user_playlist_items (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            playlist_id INT NOT NULL,
+            course_id INT NOT NULL,
+            item_order INT NOT NULL,
+            added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (playlist_id) REFERENCES user_playlists(id) ON DELETE CASCADE,
+            FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+        )",
+        
         // Course comments table
         "CREATE TABLE IF NOT EXISTS course_comments (
             id INT AUTO_INCREMENT PRIMARY KEY,
