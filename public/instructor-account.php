@@ -117,10 +117,10 @@ $recent_enrollments = $stmt->fetchAll();
                         <!-- Teaching Dropdown -->
                         <div class="absolute top-full left-0 mt-1 w-64 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                             <div class="py-2">
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <a href="create_course.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     <i class="fas fa-plus mr-2"></i>Create New Course
                                 </a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <a href="my_courses.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     <i class="fas fa-book mr-2"></i>My Courses
                                 </a>
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -304,9 +304,9 @@ $recent_enrollments = $stmt->fetchAll();
                     </div>
                 </div>
                 <div class="flex space-x-4">
-                    <button class="bg-[#0E447A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#1e5a96] transition-colors">
+                    <a href="create_course.php" class="bg-[#0E447A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#1e5a96] transition-colors inline-flex items-center">
                         <i class="fas fa-plus mr-2"></i>Create Course
-                    </button>
+                    </a>
                     <button class="bg-white border-2 border-[#0E447A] text-[#0E447A] px-6 py-3 rounded-lg font-semibold hover:bg-[#0E447A] hover:text-white transition-colors">
                         <i class="fas fa-chart-line mr-2"></i>View Analytics
                     </button>
