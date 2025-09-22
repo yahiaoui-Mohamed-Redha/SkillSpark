@@ -23,6 +23,11 @@ $course_id = $_GET['id'] ?? 0;
 $success_message = '';
 $error_message = '';
 
+// Debug information
+if (empty($course_id)) {
+    $error_message = 'No course ID provided';
+}
+
 // Get course details
 $course = null;
 $course_media = [];
@@ -42,41 +47,58 @@ try {
     $course = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$course) {
-        header('Location: my_courses.php');
-        exit();
+        $error_message = 'Course not found or you do not have permission to view this course';
     }
     
-    // Get course media
-    $query = "SELECT * FROM course_media WHERE course_id = :course_id ORDER BY media_type, created_at";
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(':course_id', $course_id);
-    $stmt->execute();
-    $course_media = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Get course media (with error handling)
+    $course_media = [];
+    try {
+        $query = "SELECT * FROM course_media WHERE course_id = :course_id ORDER BY media_type, created_at";
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':course_id', $course_id);
+        $stmt->execute();
+        $course_media = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        // Table might not exist yet, continue without media
+        $course_media = [];
+    }
     
     // Get enrollments
-    $query = "SELECT e.*, u.first_name, u.last_name, u.email 
-              FROM enrollments e 
-              JOIN users u ON e.user_id = u.id 
-              WHERE e.course_id = :course_id 
-              ORDER BY e.enrolled_at DESC";
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(':course_id', $course_id);
-    $stmt->execute();
-    $enrollments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $enrollments = [];
+    try {
+        $query = "SELECT e.*, u.first_name, u.last_name, u.email 
+                  FROM enrollments e 
+                  JOIN users u ON e.user_id = u.id 
+                  WHERE e.course_id = :course_id 
+                  ORDER BY e.enrolled_at DESC";
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':course_id', $course_id);
+        $stmt->execute();
+        $enrollments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        // Table might not exist yet, continue without enrollments
+        $enrollments = [];
+    }
     
     // Get reviews
-    $query = "SELECT cr.*, u.first_name, u.last_name 
-              FROM course_reviews cr 
-              JOIN users u ON cr.user_id = u.id 
-              WHERE cr.course_id = :course_id 
-              ORDER BY cr.created_at DESC";
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(':course_id', $course_id);
-    $stmt->execute();
-    $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $reviews = [];
+    try {
+        $query = "SELECT cr.*, u.first_name, u.last_name 
+                  FROM course_reviews cr 
+                  JOIN users u ON cr.user_id = u.id 
+                  WHERE cr.course_id = :course_id 
+                  ORDER BY cr.created_at DESC";
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':course_id', $course_id);
+        $stmt->execute();
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        // Table might not exist yet, continue without reviews
+        $reviews = [];
+    }
     
 } catch (PDOException $e) {
-    $error_message = 'Error loading course details';
+    $error_message = 'Error loading course details: ' . $e->getMessage();
 }
 ?>
 
@@ -123,6 +145,7 @@ try {
             </div>
         <?php endif; ?>
 
+        <?php if($course): ?>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Main Content -->
             <div class="lg:col-span-2 space-y-6">
@@ -275,6 +298,16 @@ try {
                 </div>
             </div>
         </div>
+        <?php else: ?>
+        <div class="text-center py-12">
+            <i class="fas fa-exclamation-triangle text-6xl text-gray-400 mb-4"></i>
+            <h3 class="text-xl font-medium text-gray-900 mb-2">Course Not Found</h3>
+            <p class="text-gray-600 mb-6">The course you're looking for doesn't exist or you don't have permission to view it.</p>
+            <a href="my_courses.php" class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700">
+                <i class="fas fa-arrow-left mr-2"></i>Back to My Courses
+            </a>
+        </div>
+        <?php endif; ?>
     </div>
 </body>
 </html>
