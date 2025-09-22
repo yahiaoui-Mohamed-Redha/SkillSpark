@@ -141,6 +141,11 @@ try {
                                 <img src="file_viewer.php?file=<?php echo urlencode($cover_path); ?>" 
                                      alt="<?php echo htmlspecialchars($course['title']); ?>" 
                                      class="w-full h-full object-cover">
+                                <?php else: ?>
+                                <div class="h-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                                    <i class="fas fa-book text-6xl text-white"></i>
+                                </div>
+                                <?php endif; ?>
                             <?php else: ?>
                                 <div class="h-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                                     <i class="fas fa-book text-6xl text-white"></i>

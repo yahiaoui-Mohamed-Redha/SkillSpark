@@ -182,6 +182,18 @@ try {
                                         <img src="file_viewer.php?file=<?php echo urlencode($cover_path); ?>" 
                                              alt="<?php echo htmlspecialchars($course['title']); ?>" 
                                              class="w-full h-full object-cover">
+                                        <?php else: ?>
+                                        <div class="h-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center relative">
+                                            <div class="text-center text-white">
+                                                <i class="fas fa-book text-6xl mb-2 opacity-20"></i>
+                                            </div>
+                                            <div class="absolute top-4 left-4">
+                                                <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                                    <i class="fas fa-book text-2xl text-white"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <?php endif; ?>
                                     <?php else: ?>
                                         <div class="h-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center relative">
                                             <div class="text-center text-white">
