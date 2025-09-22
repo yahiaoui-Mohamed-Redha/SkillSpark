@@ -58,9 +58,13 @@ try {
         $stmt->bindParam(':course_id', $course_id);
         $stmt->execute();
         $course_media = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Debug: Log media data
+        error_log("Course media for course $course_id: " . json_encode($course_media));
     } catch (PDOException $e) {
         // Table might not exist yet, continue without media
         $course_media = [];
+        error_log("Error fetching course media: " . $e->getMessage());
     }
     
     // Get enrollments
@@ -178,7 +182,7 @@ try {
                         <h2 class="text-lg font-semibold text-gray-900 mb-4">Course Video</h2>
                         <div class="relative">
                             <video class="w-full rounded-lg shadow-lg" controls poster="" preload="metadata">
-                                <source src="<?php echo htmlspecialchars($video['file_path']); ?>" type="<?php echo htmlspecialchars($video['file_type']); ?>">
+                                <source src="file_viewer.php?file=<?php echo urlencode($video['file_path']); ?>" type="<?php echo htmlspecialchars($video['file_type']); ?>">
                                 Your browser does not support the video tag.
                             </video>
                             <div class="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">

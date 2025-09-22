@@ -24,10 +24,12 @@ $courses = [];
 try {
     $query = "SELECT c.*, 
               COUNT(e.id) as enrollment_count,
-              AVG(cr.rating) as avg_rating
+              AVG(cr.rating) as avg_rating,
+              cm.file_path as cover_image
               FROM courses c 
               LEFT JOIN enrollments e ON c.id = e.course_id
               LEFT JOIN course_reviews cr ON c.id = cr.course_id
+              LEFT JOIN course_media cm ON c.id = cm.course_id AND cm.media_type = 'course_cover'
               WHERE c.instructor_id = :instructor_id 
               GROUP BY c.id
               ORDER BY c.created_at DESC";
@@ -128,13 +130,18 @@ try {
                 <?php foreach($courses as $course): ?>
                     <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onclick="window.location.href='course_detail.php?id=<?php echo $course['id']; ?>'">
                         <!-- Course Image -->
-                        <div class="h-48 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                            <i class="fas fa-book text-6xl text-white"></i>
-                        </div>
-                        
-                        <!-- Course Info -->
-                        <div class="p-6">
-                            <div class="flex items-center justify-between mb-2">
+                        <div class="h-48 relative overflow-hidden">
+                            <?php if (!empty($course['cover_image']) && file_exists($course['cover_image'])): ?>
+                                <img src="file_viewer.php?file=<?php echo urlencode($course['cover_image']); ?>" 
+                                     alt="<?php echo htmlspecialchars($course['title']); ?>" 
+                                     class="w-full h-full object-cover">
+                            <?php else: ?>
+                                <div class="h-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                                    <i class="fas fa-book text-6xl text-white"></i>
+                                </div>
+                            <?php endif; ?>
+                            <!-- Course Status Badge -->
+                            <div class="absolute top-2 right-2">
                                 <span class="px-2 py-1 text-xs rounded-full 
                                     <?php 
                                     switch($course['status']) {
@@ -145,6 +152,12 @@ try {
                                     ?>">
                                     <?php echo ucfirst($course['status']); ?>
                                 </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Course Info -->
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
                                 <span class="text-sm text-gray-500"><?php echo $course['category'] ?? 'Uncategorized'; ?></span>
                             </div>
                             

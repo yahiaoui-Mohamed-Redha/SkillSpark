@@ -14,9 +14,29 @@ $user = $auth->getCurrentUser();
 $database = new Database();
 $conn = $database->getConnection();
 
-// Get file ID from URL
+// Get file parameters from URL
 $file_id = $_GET['id'] ?? 0;
 $file_type = $_GET['type'] ?? '';
+$file_path = $_GET['file'] ?? '';
+
+// Handle direct file path
+if ($file_path) {
+    $file_path = urldecode($file_path);
+    if (file_exists($file_path)) {
+        $file_info = pathinfo($file_path);
+        $mime_type = mime_content_type($file_path);
+        
+        header('Content-Type: ' . $mime_type);
+        header('Content-Length: ' . filesize($file_path));
+        header('Content-Disposition: inline; filename="' . basename($file_path) . '"');
+        
+        readfile($file_path);
+        exit();
+    } else {
+        http_response_code(404);
+        exit('File not found');
+    }
+}
 
 if (!$file_id || !$file_type) {
     http_response_code(404);

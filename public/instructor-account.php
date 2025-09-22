@@ -58,7 +58,11 @@ $stmt->execute();
 $stats['avg_rating'] = round($stmt->fetch()['avg_rating'] ?? 0, 1);
 
 // Recent courses
-$query = "SELECT * FROM courses WHERE instructor_id = :instructor_id ORDER BY created_at DESC LIMIT 5";
+$query = "SELECT c.*, cm.file_path as cover_image
+          FROM courses c 
+          LEFT JOIN course_media cm ON c.id = cm.course_id AND cm.media_type = 'course_cover'
+          WHERE c.instructor_id = :instructor_id 
+          ORDER BY c.created_at DESC LIMIT 5";
 $stmt = $conn->prepare($query);
 $stmt->bindParam(':instructor_id', $user['id']);
 $stmt->execute();
@@ -375,8 +379,16 @@ $recent_enrollments = $stmt->fetchAll();
                     <div class="space-y-4">
                         <?php foreach($recent_courses as $course): ?>
                         <div class="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer" onclick="window.location.href='course_detail.php?id=<?php echo $course['id']; ?>'">
-                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-book text-blue-600"></i>
+                            <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                                <?php if (!empty($course['cover_image']) && file_exists($course['cover_image'])): ?>
+                                    <img src="file_viewer.php?file=<?php echo urlencode($course['cover_image']); ?>" 
+                                         alt="<?php echo htmlspecialchars($course['title']); ?>" 
+                                         class="w-full h-full object-cover">
+                                <?php else: ?>
+                                    <div class="w-full h-full bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-book text-blue-600"></i>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                             <div class="flex-1">
                                 <p class="text-sm font-medium text-gray-800"><?php echo htmlspecialchars($course['title']); ?></p>
