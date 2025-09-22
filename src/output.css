@@ -820,6 +820,9 @@
   .border-white {
     border-color: var(--color-white);
   }
+  .border-yellow-400 {
+    border-color: var(--color-yellow-400);
+  }
   .bg-\[\#0E447A\] {
     background-color: #0E447A;
   }
@@ -1285,6 +1288,9 @@
   }
   .text-yellow-600 {
     color: var(--color-yellow-600);
+  }
+  .text-yellow-700 {
+    color: var(--color-yellow-700);
   }
   .text-yellow-800 {
     color: var(--color-yellow-800);

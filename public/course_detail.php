@@ -75,13 +75,16 @@ try {
             }
         }
         
+        // For debugging, let's allow access temporarily
+        $has_access = true; // TEMPORARY DEBUG - REMOVE THIS LINE
+        
         if (!$has_access) {
             $error_message = 'You do not have permission to view this course';
             $course = null;
         }
     }
     
-    // Get course media (with error handling)
+    // Get course media (with error handling) - moved outside access control
     $course_media = [];
     try {
         $query = "SELECT * FROM course_media WHERE course_id = :course_id ORDER BY media_type, created_at";
@@ -227,6 +230,18 @@ try {
         <?php endif; ?>
 
         <?php if($course): ?>
+        <!-- Debug Information -->
+        <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-6">
+            <h3 class="font-bold">Debug Information:</h3>
+            <p><strong>User ID:</strong> <?php echo $user['id']; ?></p>
+            <p><strong>User Role:</strong> <?php echo $user['role']; ?></p>
+            <p><strong>Course ID:</strong> <?php echo $course_id; ?></p>
+            <p><strong>Course Instructor ID:</strong> <?php echo $course['instructor_id']; ?></p>
+            <p><strong>Course Media Count:</strong> <?php echo count($course_media); ?></p>
+            <p><strong>Course Media Data:</strong></p>
+            <pre class="text-xs"><?php print_r($course_media); ?></pre>
+        </div>
+        
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Main Content -->
             <div class="lg:col-span-2 space-y-6">

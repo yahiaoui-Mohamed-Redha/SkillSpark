@@ -4,13 +4,13 @@ require_once '../config/auth.php';
 $auth = new Auth();
 
 // Check if user is logged in
-if(!$auth->isLoggedIn()) {
+if (!$auth->isLoggedIn()) {
     header('Location: login.php');
     exit();
 }
 
 // Check if user is a business account
-if($_SESSION['role'] !== 'business') {
+if ($_SESSION['role'] !== 'business') {
     header('Location: student-dashboard.php');
     exit();
 }
@@ -107,18 +107,10 @@ $recent_enrollments = $stmt->fetchAll();
 
                 <!-- Navigation Links -->
                 <div class="hidden md:flex items-center space-x-6">
-                        <a href="analytics.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
-                            <i class="fas fa-chart-bar mr-1"></i>
-                            Analytics
-                        </a>
-                        <a href="notifications.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
-                            <i class="fas fa-bell mr-1"></i>
-                            Notifications
-                        </a>
-                        <a href="support_ticket.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
-                            <i class="fas fa-life-ring mr-1"></i>
-                            Support
-                        </a>
+                    <a href="support_ticket.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
+                        <i class="fas fa-life-ring mr-1"></i>
+                        Support
+                    </a>
                     <div class="relative group">
                         <button class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center bg-transparent border-none cursor-pointer">
                             Teaching
@@ -253,15 +245,15 @@ $recent_enrollments = $stmt->fetchAll();
                 <!-- Right side navigation -->
                 <div class="flex items-center space-x-4">
                     <!-- Icons -->
-                    <button class="p-2 text-gray-600 hover:text-[#0E447A] transition-colors relative">
+                    <a href="notifications.php" class="p-2 text-gray-600 hover:text-[#0E447A] transition-colors relative">
                         <i class="fas fa-bell text-xl"></i>
                         <span class="absolute -top-1 -right-1 w-3 h-3 bg-[#0E447A] rounded-full"></span>
-                    </button>
-                    
+                    </a>
+
                     <button class="p-2 text-gray-600 hover:text-[#0E447A] transition-colors relative">
                         <i class="fas fa-question-circle text-xl"></i>
                     </button>
-                    
+
                     <!-- User Profile -->
                     <div class="relative group">
                         <button class="w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-sm hover:bg-purple-700 transition-colors">
@@ -385,38 +377,38 @@ $recent_enrollments = $stmt->fetchAll();
                         <a href="#" class="text-sm text-[#0E447A] hover:underline">View All</a>
                     </div>
                     <div class="space-y-4">
-                        <?php foreach($recent_courses as $course): ?>
-                        <div class="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer" onclick="window.location.href='course_detail.php?id=<?php echo $course['id']; ?>'">
-                            <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                                <?php if (!empty($course['cover_image'])): 
-                                    // Fix file path - remove ../ prefix if it exists
-                                    $cover_path = $course['cover_image'];
-                                    if (strpos($cover_path, '../') === 0) {
-                                        $cover_path = substr($cover_path, 3);
-                                    }
-                                    if (file_exists($cover_path)): ?>
-                                    <img src="file_viewer.php?file=<?php echo urlencode($cover_path); ?>" 
-                                         alt="<?php echo htmlspecialchars($course['title']); ?>" 
-                                         class="w-full h-full object-cover">
+                        <?php foreach ($recent_courses as $course): ?>
+                            <div class="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer" onclick="window.location.href='course_detail.php?id=<?php echo $course['id']; ?>'">
+                                <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                                    <?php if (!empty($course['cover_image'])):
+                                        // Fix file path - remove ../ prefix if it exists
+                                        $cover_path = $course['cover_image'];
+                                        if (strpos($cover_path, '../') === 0) {
+                                            $cover_path = substr($cover_path, 3);
+                                        }
+                                        if (file_exists($cover_path)): ?>
+                                            <img src="file_viewer.php?file=<?php echo urlencode($cover_path); ?>"
+                                                alt="<?php echo htmlspecialchars($course['title']); ?>"
+                                                class="w-full h-full object-cover">
+                                        <?php else: ?>
+                                            <div class="w-full h-full bg-blue-100 rounded-lg flex items-center justify-center">
+                                                <i class="fas fa-book text-blue-600"></i>
+                                            </div>
+                                        <?php endif; ?>
                                     <?php else: ?>
-                                    <div class="w-full h-full bg-blue-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-book text-blue-600"></i>
-                                    </div>
+                                        <div class="w-full h-full bg-blue-100 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-book text-blue-600"></i>
+                                        </div>
                                     <?php endif; ?>
-                                <?php else: ?>
-                                    <div class="w-full h-full bg-blue-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-book text-blue-600"></i>
-                                    </div>
-                                <?php endif; ?>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-800"><?php echo htmlspecialchars($course['title']); ?></p>
+                                    <p class="text-xs text-gray-500">$<?php echo $course['price']; ?> • <?php echo $course['students_count']; ?> students</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs text-gray-500"><?php echo date('M j', strtotime($course['created_at'])); ?></span>
+                                </div>
                             </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-800"><?php echo htmlspecialchars($course['title']); ?></p>
-                                <p class="text-xs text-gray-500">$<?php echo $course['price']; ?> • <?php echo $course['students_count']; ?> students</p>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-xs text-gray-500"><?php echo date('M j', strtotime($course['created_at'])); ?></span>
-                            </div>
-                        </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -428,19 +420,19 @@ $recent_enrollments = $stmt->fetchAll();
                         <a href="#" class="text-sm text-[#0E447A] hover:underline">View All</a>
                     </div>
                     <div class="space-y-4">
-                        <?php foreach($recent_enrollments as $enrollment): ?>
-                        <div class="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg">
-                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                                <i class="fas fa-user text-green-600"></i>
+                        <?php foreach ($recent_enrollments as $enrollment): ?>
+                            <div class="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg">
+                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-green-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-800"><?php echo htmlspecialchars($enrollment['first_name'] . ' ' . $enrollment['last_name']); ?></p>
+                                    <p class="text-xs text-gray-500">Enrolled in <?php echo htmlspecialchars($enrollment['course_title']); ?></p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs text-gray-500"><?php echo date('M j', strtotime($enrollment['enrolled_at'])); ?></span>
+                                </div>
                             </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-800"><?php echo htmlspecialchars($enrollment['first_name'] . ' ' . $enrollment['last_name']); ?></p>
-                                <p class="text-xs text-gray-500">Enrolled in <?php echo htmlspecialchars($enrollment['course_title']); ?></p>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-xs text-gray-500"><?php echo date('M j', strtotime($enrollment['enrolled_at'])); ?></span>
-                            </div>
-                        </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
