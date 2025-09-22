@@ -92,8 +92,6 @@ try {
         $stmt->execute();
         $course_media = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Debug: Log media data
-        error_log("Course media for course $course_id: " . json_encode($course_media));
     } catch (PDOException $e) {
         // Table might not exist yet, continue without media
         $course_media = [];
@@ -229,17 +227,6 @@ try {
         <?php endif; ?>
 
         <?php if($course): ?>
-        <!-- Debug Information -->
-        <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-6">
-            <h3 class="font-bold">Debug Information:</h3>
-            <p><strong>User ID:</strong> <?php echo $user['id']; ?></p>
-            <p><strong>User Role:</strong> <?php echo $user['role']; ?></p>
-            <p><strong>Course ID:</strong> <?php echo $course_id; ?></p>
-            <p><strong>Course Instructor ID:</strong> <?php echo $course['instructor_id']; ?></p>
-            <p><strong>Course Media Count:</strong> <?php echo count($course_media); ?></p>
-            <p><strong>Course Media Data:</strong></p>
-            <pre class="text-xs"><?php print_r($course_media); ?></pre>
-        </div>
         
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Main Content -->
@@ -250,9 +237,6 @@ try {
                     return $media['media_type'] === 'video';
                 });
                 
-                // Debug: Log video information
-                error_log("Course media count: " . count($course_media));
-                error_log("Video count: " . count($course_video));
                 
                 if (!empty($course_video)): 
                     $video = array_values($course_video)[0];
@@ -260,26 +244,10 @@ try {
                     $video_path = $video['file_path'];
                     // The path already has ../ prefix which is correct for public directory
                     
-                    // Debug: Log video details
-                    error_log("Original video path: " . $video['file_path']);
-                    error_log("Processed video path: " . $video_path);
-                    error_log("File exists: " . (file_exists($video_path) ? 'YES' : 'NO'));
-                    error_log("Current working directory: " . getcwd());
                 ?>
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <h2 class="text-lg font-semibold text-gray-900 mb-4">Course Video</h2>
                         
-                        <!-- Debug Information -->
-                        <div class="mb-4 p-3 bg-yellow-100 rounded-lg text-sm">
-                            <strong>Debug Info:</strong><br>
-                            Original Path: <?php echo htmlspecialchars($video['file_path']); ?><br>
-                            Processed Path: <?php echo htmlspecialchars($video_path); ?><br>
-                            File Exists: <?php echo file_exists($video_path) ? 'YES' : 'NO'; ?><br>
-                            File Size: <?php echo file_exists($video_path) ? filesize($video_path) . ' bytes' : 'N/A'; ?><br>
-                            MIME Type: <?php echo file_exists($video_path) ? mime_content_type($video_path) : 'N/A'; ?><br>
-                            Working Directory: <?php echo getcwd(); ?><br>
-                            Video URL: file_viewer.php?file=<?php echo urlencode($video_path); ?>
-                        </div>
                         
                         <div class="relative">
                             <video class="w-full rounded-lg shadow-lg" controls poster="" preload="metadata">
