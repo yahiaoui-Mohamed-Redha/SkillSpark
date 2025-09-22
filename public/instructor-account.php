@@ -107,10 +107,18 @@ $recent_enrollments = $stmt->fetchAll();
 
                 <!-- Navigation Links -->
                 <div class="hidden md:flex items-center space-x-6">
-                    <a href="support_ticket.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
-                        <i class="fas fa-life-ring mr-1"></i>
-                        Support
-                    </a>
+                        <a href="analytics.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
+                            <i class="fas fa-chart-bar mr-1"></i>
+                            Analytics
+                        </a>
+                        <a href="notifications.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
+                            <i class="fas fa-bell mr-1"></i>
+                            Notifications
+                        </a>
+                        <a href="support_ticket.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
+                            <i class="fas fa-life-ring mr-1"></i>
+                            Support
+                        </a>
                     <div class="relative group">
                         <button class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center bg-transparent border-none cursor-pointer">
                             Teaching

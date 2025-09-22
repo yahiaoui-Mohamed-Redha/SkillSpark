@@ -72,10 +72,18 @@ try {
 
                 <!-- Navigation Links -->
                 <div class="hidden md:flex items-center space-x-6">
-                    <a href="support_ticket.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
-                        <i class="fas fa-life-ring mr-1"></i>
-                        Support
-                    </a>
+                        <a href="browse_courses.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
+                            <i class="fas fa-search mr-1"></i>
+                            Browse Courses
+                        </a>
+                        <a href="notifications.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
+                            <i class="fas fa-bell mr-1"></i>
+                            Notifications
+                        </a>
+                        <a href="support_ticket.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
+                            <i class="fas fa-life-ring mr-1"></i>
+                            Support
+                        </a>
                     <a href="logout.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
                         <i class="fas fa-sign-out-alt mr-1"></i>
                         Logout

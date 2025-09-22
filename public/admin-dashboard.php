@@ -97,10 +97,14 @@ $recent_courses = $stmt->fetchAll();
 
                 <!-- Navigation Links -->
                 <div class="hidden md:flex items-center space-x-6">
-                    <a href="admin_support.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
-                        <i class="fas fa-life-ring mr-1"></i>
-                        Support
-                    </a>
+                        <a href="admin_panel.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
+                            <i class="fas fa-cog mr-1"></i>
+                            Admin Panel
+                        </a>
+                        <a href="admin_support.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
+                            <i class="fas fa-life-ring mr-1"></i>
+                            Support
+                        </a>
                     <a href="#" class="text-black hover:text-[#0E447A] font-medium transition-colors">Users</a>
                     <a href="#" class="text-black hover:text-[#0E447A] font-medium transition-colors">Courses</a>
                     <a href="#" class="text-black hover:text-[#0E447A] font-medium transition-colors">Analytics</a>
