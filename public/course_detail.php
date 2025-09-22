@@ -256,11 +256,9 @@ try {
                 
                 if (!empty($course_video)): 
                     $video = array_values($course_video)[0];
-                    // Fix file path - remove ../ prefix if it exists
+                    // Fix file path - keep the ../ prefix since we're in public directory
                     $video_path = $video['file_path'];
-                    if (strpos($video_path, '../') === 0) {
-                        $video_path = substr($video_path, 3);
-                    }
+                    // The path already has ../ prefix which is correct for public directory
                     
                     // Debug: Log video details
                     error_log("Original video path: " . $video['file_path']);
