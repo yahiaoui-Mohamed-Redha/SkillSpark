@@ -97,6 +97,23 @@ try {
         $reviews = [];
     }
     
+    // Get comments
+    $comments = [];
+    try {
+        $query = "SELECT cc.*, u.first_name, u.last_name, u.profile_image
+                  FROM course_comments cc 
+                  JOIN users u ON cc.user_id = u.id 
+                  WHERE cc.course_id = :course_id AND cc.is_approved = 1
+                  ORDER BY cc.created_at DESC";
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':course_id', $course_id);
+        $stmt->execute();
+        $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        // Table might not exist yet, continue without comments
+        $comments = [];
+    }
+    
 } catch (PDOException $e) {
     $error_message = 'Error loading course details: ' . $e->getMessage();
 }
@@ -159,10 +176,27 @@ try {
                 ?>
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <h2 class="text-lg font-semibold text-gray-900 mb-4">Course Video</h2>
-                        <video class="w-full rounded-lg" controls>
-                            <source src="<?php echo htmlspecialchars($video['file_path']); ?>" type="<?php echo htmlspecialchars($video['file_type']); ?>">
-                            Your browser does not support the video tag.
-                        </video>
+                        <div class="relative">
+                            <video class="w-full rounded-lg shadow-lg" controls poster="" preload="metadata">
+                                <source src="<?php echo htmlspecialchars($video['file_path']); ?>" type="<?php echo htmlspecialchars($video['file_type']); ?>">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
+                                <?php echo round($video['file_size'] / 1024 / 1024, 1); ?> MB
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-center justify-between text-sm text-gray-600">
+                            <span><i class="fas fa-play mr-1"></i><?php echo htmlspecialchars($video['file_name']); ?></span>
+                            <span><i class="fas fa-clock mr-1"></i>Video Content</span>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Course Video</h2>
+                        <div class="text-center py-12 text-gray-500">
+                            <i class="fas fa-video text-6xl mb-4"></i>
+                            <p>No video uploaded yet</p>
+                        </div>
                     </div>
                 <?php endif; ?>
 
@@ -190,6 +224,57 @@ try {
                         </div>
                     </div>
                 <?php endif; ?>
+
+                <!-- Comments Section -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Comments & Discussion</h2>
+                    
+                    <!-- Add Comment Form -->
+                    <div class="mb-6">
+                        <form id="commentForm" class="space-y-4">
+                            <div>
+                                <textarea id="commentText" rows="3" placeholder="Share your thoughts about this course..." 
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                                    <i class="fas fa-comment mr-1"></i>Post Comment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Comments List -->
+                    <div class="space-y-4">
+                        <?php if(empty($comments)): ?>
+                            <div class="text-center py-8 text-gray-500">
+                                <i class="fas fa-comments text-4xl mb-4"></i>
+                                <p>No comments yet. Be the first to share your thoughts!</p>
+                            </div>
+                        <?php else: ?>
+                            <?php foreach($comments as $comment): ?>
+                                <div class="border-b border-gray-200 pb-4 last:border-b-0">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                            <i class="fas fa-user text-blue-600"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between mb-1">
+                                                <span class="font-medium text-gray-900">
+                                                    <?php echo htmlspecialchars($comment['first_name'] . ' ' . $comment['last_name']); ?>
+                                                </span>
+                                                <span class="text-xs text-gray-500">
+                                                    <?php echo date('M j, Y g:i A', strtotime($comment['created_at'])); ?>
+                                                </span>
+                                            </div>
+                                            <p class="text-gray-700"><?php echo nl2br(htmlspecialchars($comment['comment_text'])); ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
 
             <!-- Sidebar -->
@@ -309,5 +394,59 @@ try {
         </div>
         <?php endif; ?>
     </div>
+
+    <script>
+        // Comment form handling
+        document.getElementById('commentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const commentText = document.getElementById('commentText').value.trim();
+            if (!commentText) {
+                alert('Please enter a comment');
+                return;
+            }
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('action', 'add_comment');
+            formData.append('course_id', '<?php echo $course_id; ?>');
+            formData.append('comment_text', commentText);
+            
+            // Send AJAX request
+            fetch('add_comment.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload page to show new comment
+                    location.reload();
+                } else {
+                    alert('Error adding comment: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding comment');
+            });
+        });
+        
+        // Video player enhancements
+        const video = document.querySelector('video');
+        if (video) {
+            video.addEventListener('loadstart', function() {
+                console.log('Video loading started');
+            });
+            
+            video.addEventListener('canplay', function() {
+                console.log('Video can start playing');
+            });
+            
+            video.addEventListener('error', function(e) {
+                console.error('Video error:', e);
+            });
+        }
+    </script>
 </body>
 </html>
