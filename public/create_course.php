@@ -84,6 +84,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             
+            // Handle course video upload
+            if (isset($_FILES['course_video']) && $_FILES['course_video']['error'] === UPLOAD_ERR_OK) {
+                $upload_dir = '../uploads/course_video/';
+                $file_extension = strtolower(pathinfo($_FILES['course_video']['name'], PATHINFO_EXTENSION));
+                $filename = uniqid() . '_' . time() . '.' . $file_extension;
+                $file_path = $upload_dir . $filename;
+                
+                if (move_uploaded_file($_FILES['course_video']['tmp_name'], $file_path)) {
+                    // Save to course_media table
+                    $query = "INSERT INTO course_media (course_id, media_type, file_name, file_path, file_size, file_type) 
+                             VALUES (:course_id, 'video', :file_name, :file_path, :file_size, :file_type)";
+                    $stmt = $conn->prepare($query);
+                    $stmt->bindParam(':course_id', $course_id);
+                    $stmt->bindParam(':file_name', $_FILES['course_video']['name']);
+                    $stmt->bindParam(':file_path', $file_path);
+                    $stmt->bindParam(':file_size', $_FILES['course_video']['size']);
+                    $stmt->bindParam(':file_type', $_FILES['course_video']['type']);
+                    $stmt->execute();
+                }
+            }
+            
             $conn->commit();
             $success_message = 'Course created successfully!';
             
@@ -222,6 +243,25 @@ try {
                 </div>
             </div>
             
+            <div class="bg-white shadow rounded-lg p-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Course Video</h2>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer" id="video-upload">
+                    <input type="file" id="course_video" name="course_video" accept="video/*" class="hidden">
+                    <div id="video-preview" class="hidden">
+                        <video id="video-preview-player" class="w-full max-w-md mx-auto mb-2 rounded" controls>
+                            <source id="video-source" src="" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <p class="text-sm text-gray-600">Click to change video</p>
+                    </div>
+                    <div id="video-placeholder">
+                        <i class="fas fa-video text-4xl text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-600">Click to upload course video</p>
+                        <p class="text-xs text-gray-500">MP4, AVI, MOV up to 100MB</p>
+                    </div>
+                </div>
+            </div>
+            
             <div class="flex justify-end space-x-4">
                 <a href="instructor-account.php" class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
                     Cancel
@@ -253,6 +293,27 @@ try {
                     coverPlaceholder.classList.add('hidden');
                 };
                 reader.readAsDataURL(file);
+            }
+        });
+
+        // Video upload handling
+        const videoUpload = document.getElementById('video-upload');
+        const videoInput = document.getElementById('course_video');
+        const videoPreview = document.getElementById('video-preview');
+        const videoPlaceholder = document.getElementById('video-placeholder');
+        const videoPlayer = document.getElementById('video-preview-player');
+        const videoSource = document.getElementById('video-source');
+
+        videoUpload.addEventListener('click', () => videoInput.click());
+
+        videoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                videoSource.src = url;
+                videoPlayer.load();
+                videoPreview.classList.remove('hidden');
+                videoPlaceholder.classList.add('hidden');
             }
         });
     </script>

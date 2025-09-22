@@ -374,7 +374,7 @@ $recent_enrollments = $stmt->fetchAll();
                     </div>
                     <div class="space-y-4">
                         <?php foreach($recent_courses as $course): ?>
-                        <div class="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer" onclick="window.location.href='course_detail.php?id=<?php echo $course['id']; ?>'">
                             <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                                 <i class="fas fa-book text-blue-600"></i>
                             </div>

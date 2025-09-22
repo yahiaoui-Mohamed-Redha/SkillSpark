@@ -126,7 +126,7 @@ try {
                 </div>
             <?php else: ?>
                 <?php foreach($courses as $course): ?>
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onclick="window.location.href='course_detail.php?id=<?php echo $course['id']; ?>'">
                         <!-- Course Image -->
                         <div class="h-48 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                             <i class="fas fa-book text-6xl text-white"></i>
