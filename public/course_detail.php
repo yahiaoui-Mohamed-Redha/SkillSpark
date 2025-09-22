@@ -415,6 +415,22 @@ try {
 
             <!-- Sidebar -->
             <div class="space-y-6">
+                <!-- Course Cover Image -->
+                <?php 
+                $course_cover = array_filter($course_media, function($media) {
+                    return $media['media_type'] === 'course_cover';
+                });
+                if (!empty($course_cover)): 
+                    $cover = array_values($course_cover)[0];
+                    $cover_path = $cover['file_path'];
+                ?>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="file_viewer.php?file=<?php echo urlencode($cover_path); ?>" 
+                         alt="<?php echo htmlspecialchars($course['title']); ?>" 
+                         class="w-full h-48 object-cover">
+                </div>
+                <?php endif; ?>
+
                 <!-- Course Stats -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Course Statistics</h3>

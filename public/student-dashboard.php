@@ -60,45 +60,75 @@ try {
 
 <body class="bg-gray-50">
     <!-- Header Section -->
-    <section id="header" class="bg-white sticky top-0 z-50 transition-shadow duration-300">
+    <header class="bg-white shadow-sm border-b sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <!-- Logo -->
+                <!-- Logo and Brand -->
                 <div class="flex items-center">
-                    <div class="flex items-center space-x-3">
-                        <img src="../public/assist/logo2.png" alt="SkillSpark Logo" class="h-12 w-auto">
-                    </div>
-                </div>
-
-                <!-- Navigation Links -->
-                <div class="hidden md:flex items-center space-x-6">
-                        <a href="browse_courses.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
-                            <i class="fas fa-search mr-1"></i>
-                            Browse Courses
-                        </a>
-                        <a href="notifications.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
-                            <i class="fas fa-bell mr-1"></i>
-                            Notifications
-                        </a>
-                        <a href="support_ticket.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
-                            <i class="fas fa-life-ring mr-1"></i>
-                            Support
-                        </a>
-                    <a href="logout.php" class="text-black hover:text-[#0E447A] font-medium transition-colors flex items-center">
-                        <i class="fas fa-sign-out-alt mr-1"></i>
-                        Logout
+                    <a href="student-dashboard.php" class="flex items-center space-x-3">
+                        <img src="../public/assist/logo2.png" alt="SkillSpark Logo" class="h-10 w-auto">
+                        <span class="text-xl font-bold text-gray-900">SkillSpark</span>
                     </a>
                 </div>
 
-                <!-- Mobile menu button -->
-                <div class="md:hidden">
-                    <button type="button" class="text-gray-500 hover:text-gray-600 focus:outline-none focus:text-gray-600">
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="student-dashboard.php" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+                        Dashboard
+                    </a>
+                    <a href="browse_courses.php" class="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center">
+                        <i class="fas fa-search mr-2"></i>
+                        Browse Courses
+                    </a>
+                    <a href="notifications.php" class="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center relative">
+                        <i class="fas fa-bell mr-2"></i>
+                        Notifications
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                    </a>
+                </nav>
+
+                <!-- User Menu -->
+                <div class="flex items-center space-x-4">
+                    <a href="support_ticket.php" class="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center">
+                        <i class="fas fa-life-ring mr-2"></i>
+                        Support
+                    </a>
+                    
+                    <!-- User Profile Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 focus:outline-none">
+                            <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                                <?php echo strtoupper(substr($user['first_name'], 0, 1)); ?>
+                            </div>
+                            <span class="hidden md:block font-medium"><?php echo htmlspecialchars($user['first_name']); ?></span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div class="py-1">
+                                <a href="profile.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i>Profile
+                                </a>
+                                <a href="settings.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-cog mr-2"></i>Settings
+                                </a>
+                                <div class="border-t border-gray-200"></div>
+                                <a href="logout.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile menu button -->
+                    <button type="button" class="md:hidden text-gray-500 hover:text-gray-600 focus:outline-none">
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
             </div>
         </div>
-    </section>
+    </header>
 
     <!-- Category Navigation -->
     <section class="bg-gray-100 py-4">
@@ -130,6 +160,74 @@ try {
                     <h1 class="text-3xl font-bold text-gray-800">Welcome back, <?php echo htmlspecialchars($user['first_name']); ?></h1>
                     <a href="#" class="text-[#0E447A] hover:underline font-medium">Add occupation and interests</a>
                 </div>
+            </div>
+
+            <!-- Search and Filter Section -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Find Your Next Course</h2>
+                <form method="GET" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <!-- Search Input -->
+                        <div>
+                            <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search Courses</label>
+                            <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="Search by title or description...">
+                        </div>
+                        
+                        <!-- Category Filter -->
+                        <div>
+                            <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                            <select id="category" name="category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">All Categories</option>
+                                <?php
+                                try {
+                                    $query = "SELECT DISTINCT category FROM courses WHERE status = 'active' ORDER BY category";
+                                    $stmt = $conn->prepare($query);
+                                    $stmt->execute();
+                                    $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                    foreach ($categories as $cat) {
+                                        $selected = ($_GET['category'] ?? '') === $cat['category'] ? 'selected' : '';
+                                        echo "<option value=\"" . htmlspecialchars($cat['category']) . "\" $selected>" . htmlspecialchars($cat['category']) . "</option>";
+                                    }
+                                } catch (PDOException $e) {
+                                    // Handle error silently
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        
+                        <!-- Price Filter -->
+                        <div>
+                            <label for="price" class="block text-sm font-medium text-gray-700 mb-2">Price</label>
+                            <select id="price" name="price" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">All Prices</option>
+                                <option value="free" <?php echo ($_GET['price'] ?? '') === 'free' ? 'selected' : ''; ?>>Free</option>
+                                <option value="paid" <?php echo ($_GET['price'] ?? '') === 'paid' ? 'selected' : ''; ?>>Paid</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Sort By -->
+                        <div>
+                            <label for="sort" class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                            <select id="sort" name="sort" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="newest" <?php echo ($_GET['sort'] ?? '') === 'newest' ? 'selected' : ''; ?>>Newest</option>
+                                <option value="price_low" <?php echo ($_GET['sort'] ?? '') === 'price_low' ? 'selected' : ''; ?>>Price: Low to High</option>
+                                <option value="price_high" <?php echo ($_GET['sort'] ?? '') === 'price_high' ? 'selected' : ''; ?>>Price: High to Low</option>
+                                <option value="rating" <?php echo ($_GET['sort'] ?? '') === 'rating' ? 'selected' : ''; ?>>Highest Rated</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
+                            <i class="fas fa-search mr-2"></i>Search Courses
+                        </button>
+                        <a href="student-dashboard.php" class="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700">
+                            <i class="fas fa-refresh mr-2"></i>Clear Filters
+                        </a>
+                    </div>
+                </form>
             </div>
 
             <!-- What to learn next section -->
