@@ -35,19 +35,50 @@ $enrollments = [];
 $reviews = [];
 
 try {
-    // Get course
+    // Get course - allow access for instructor, enrolled students, or admins
     $query = "SELECT c.*, u.first_name, u.last_name 
               FROM courses c 
               JOIN users u ON c.instructor_id = u.id 
-              WHERE c.id = :course_id AND c.instructor_id = :instructor_id";
+              WHERE c.id = :course_id";
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':course_id', $course_id);
-    $stmt->bindParam(':instructor_id', $user['id']);
     $stmt->execute();
     $course = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$course) {
-        $error_message = 'Course not found or you do not have permission to view this course';
+        $error_message = 'Course not found';
+    } else {
+        // Check if user has access to this course
+        $has_access = false;
+        
+        // Check if user is the instructor
+        if ($course['instructor_id'] == $user['id']) {
+            $has_access = true;
+        }
+        
+        // Check if user is admin
+        if ($user['role'] === 'admin') {
+            $has_access = true;
+        }
+        
+        // Check if user is enrolled (for students)
+        if ($user['role'] === 'student') {
+            $enrollment_query = "SELECT * FROM enrollments WHERE course_id = :course_id AND user_id = :user_id";
+            $enrollment_stmt = $conn->prepare($enrollment_query);
+            $enrollment_stmt->bindParam(':course_id', $course_id);
+            $enrollment_stmt->bindParam(':user_id', $user['id']);
+            $enrollment_stmt->execute();
+            $enrollment = $enrollment_stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($enrollment) {
+                $has_access = true;
+            }
+        }
+        
+        if (!$has_access) {
+            $error_message = 'You do not have permission to view this course';
+            $course = null;
+        }
     }
     
     // Get course media (with error handling)
@@ -204,6 +235,11 @@ try {
                 $course_video = array_filter($course_media, function($media) {
                     return $media['media_type'] === 'video';
                 });
+                
+                // Debug: Log video information
+                error_log("Course media count: " . count($course_media));
+                error_log("Video count: " . count($course_video));
+                
                 if (!empty($course_video)): 
                     $video = array_values($course_video)[0];
                     // Fix file path - remove ../ prefix if it exists
@@ -211,9 +247,24 @@ try {
                     if (strpos($video_path, '../') === 0) {
                         $video_path = substr($video_path, 3);
                     }
+                    
+                    // Debug: Log video details
+                    error_log("Video path: " . $video_path);
+                    error_log("File exists: " . (file_exists($video_path) ? 'YES' : 'NO'));
                 ?>
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <h2 class="text-lg font-semibold text-gray-900 mb-4">Course Video</h2>
+                        
+                        <!-- Debug Information -->
+                        <div class="mb-4 p-3 bg-yellow-100 rounded-lg text-sm">
+                            <strong>Debug Info:</strong><br>
+                            Video Path: <?php echo htmlspecialchars($video_path); ?><br>
+                            File Exists: <?php echo file_exists($video_path) ? 'YES' : 'NO'; ?><br>
+                            File Size: <?php echo file_exists($video_path) ? filesize($video_path) . ' bytes' : 'N/A'; ?><br>
+                            MIME Type: <?php echo file_exists($video_path) ? mime_content_type($video_path) : 'N/A'; ?><br>
+                            Video URL: file_viewer.php?file=<?php echo urlencode($video_path); ?>
+                        </div>
+                        
                         <div class="relative">
                             <video class="w-full rounded-lg shadow-lg" controls poster="" preload="metadata">
                                 <source src="file_viewer.php?file=<?php echo urlencode($video_path); ?>" type="<?php echo htmlspecialchars($video['file_type']); ?>">
