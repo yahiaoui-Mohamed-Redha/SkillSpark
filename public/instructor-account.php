@@ -390,6 +390,11 @@ $recent_enrollments = $stmt->fetchAll();
                                     <img src="file_viewer.php?file=<?php echo urlencode($cover_path); ?>" 
                                          alt="<?php echo htmlspecialchars($course['title']); ?>" 
                                          class="w-full h-full object-cover">
+                                    <?php else: ?>
+                                    <div class="w-full h-full bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-book text-blue-600"></i>
+                                    </div>
+                                    <?php endif; ?>
                                 <?php else: ?>
                                     <div class="w-full h-full bg-blue-100 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-book text-blue-600"></i>
