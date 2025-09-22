@@ -29,10 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $price = floatval($_POST['price']);
     $category_id = intval($_POST['category_id']);
     $level = $_POST['level'];
-    $language = $_POST['language'];
     $duration_hours = intval($_POST['duration_hours']);
-    $prerequisites = trim($_POST['prerequisites']);
-    $learning_outcomes = trim($_POST['learning_outcomes']);
     
     if (empty($title) || empty($description) || empty($category_id)) {
         $error_message = 'Please fill in all required fields';
@@ -40,20 +37,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $conn->beginTransaction();
             
+            // Get category name
+            $category_name = '';
+            $cat_query = "SELECT name FROM categories WHERE id = :category_id";
+            $cat_stmt = $conn->prepare($cat_query);
+            $cat_stmt->bindParam(':category_id', $category_id);
+            $cat_stmt->execute();
+            $category_result = $cat_stmt->fetch();
+            if ($category_result) {
+                $category_name = $category_result['name'];
+            }
+            
             // Insert course
-            $query = "INSERT INTO courses (title, description, instructor_id, price, category_id, level, language, duration_hours, prerequisites, learning_outcomes, created_at) 
-                     VALUES (:title, :description, :instructor_id, :price, :category_id, :level, :language, :duration_hours, :prerequisites, :learning_outcomes, NOW())";
+            $query = "INSERT INTO courses (title, description, instructor_id, price, category, level, duration_hours, created_at) 
+                     VALUES (:title, :description, :instructor_id, :price, :category, :level, :duration_hours, NOW())";
             $stmt = $conn->prepare($query);
             $stmt->bindParam(':title', $title);
             $stmt->bindParam(':description', $description);
             $stmt->bindParam(':instructor_id', $user['id']);
             $stmt->bindParam(':price', $price);
-            $stmt->bindParam(':category_id', $category_id);
+            $stmt->bindParam(':category', $category_name);
             $stmt->bindParam(':level', $level);
-            $stmt->bindParam(':language', $language);
             $stmt->bindParam(':duration_hours', $duration_hours);
-            $stmt->bindParam(':prerequisites', $prerequisites);
-            $stmt->bindParam(':learning_outcomes', $learning_outcomes);
             $stmt->execute();
             
             $course_id = $conn->lastInsertId();
@@ -184,15 +189,6 @@ try {
                         </select>
                     </div>
                     
-                    <div>
-                        <label for="language" class="block text-sm font-medium text-gray-700 mb-2">Language</label>
-                        <select id="language" name="language" 
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="english" <?php echo (isset($_POST['language']) && $_POST['language'] == 'english') ? 'selected' : ''; ?>>English</option>
-                            <option value="arabic" <?php echo (isset($_POST['language']) && $_POST['language'] == 'arabic') ? 'selected' : ''; ?>>Arabic</option>
-                            <option value="french" <?php echo (isset($_POST['language']) && $_POST['language'] == 'french') ? 'selected' : ''; ?>>French</option>
-                        </select>
-                    </div>
                     
                     <div>
                         <label for="duration_hours" class="block text-sm font-medium text-gray-700 mb-2">Duration (Hours)</label>
@@ -208,17 +204,6 @@ try {
                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"><?php echo isset($_POST['description']) ? htmlspecialchars($_POST['description']) : ''; ?></textarea>
                 </div>
                 
-                <div class="mt-6">
-                    <label for="prerequisites" class="block text-sm font-medium text-gray-700 mb-2">Prerequisites</label>
-                    <textarea id="prerequisites" name="prerequisites" rows="3" 
-                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"><?php echo isset($_POST['prerequisites']) ? htmlspecialchars($_POST['prerequisites']) : ''; ?></textarea>
-                </div>
-                
-                <div class="mt-6">
-                    <label for="learning_outcomes" class="block text-sm font-medium text-gray-700 mb-2">Learning Outcomes</label>
-                    <textarea id="learning_outcomes" name="learning_outcomes" rows="3" 
-                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"><?php echo isset($_POST['learning_outcomes']) ? htmlspecialchars($_POST['learning_outcomes']) : ''; ?></textarea>
-                </div>
             </div>
             
             <div class="bg-white shadow rounded-lg p-6">

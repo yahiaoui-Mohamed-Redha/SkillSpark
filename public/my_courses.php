@@ -22,11 +22,10 @@ $conn = $database->getConnection();
 // Get instructor's courses
 $courses = [];
 try {
-    $query = "SELECT c.*, cat.name as category_name, 
+    $query = "SELECT c.*, 
               COUNT(e.id) as enrollment_count,
               AVG(cr.rating) as avg_rating
               FROM courses c 
-              LEFT JOIN categories cat ON c.category_id = cat.id
               LEFT JOIN enrollments e ON c.id = e.course_id
               LEFT JOIN course_reviews cr ON c.id = cr.course_id
               WHERE c.instructor_id = :instructor_id 
@@ -146,7 +145,7 @@ try {
                                     ?>">
                                     <?php echo ucfirst($course['status']); ?>
                                 </span>
-                                <span class="text-sm text-gray-500"><?php echo $course['category_name'] ?? 'Uncategorized'; ?></span>
+                                <span class="text-sm text-gray-500"><?php echo $course['category'] ?? 'Uncategorized'; ?></span>
                             </div>
                             
                             <h3 class="text-lg font-semibold text-gray-900 mb-2"><?php echo htmlspecialchars($course['title']); ?></h3>
