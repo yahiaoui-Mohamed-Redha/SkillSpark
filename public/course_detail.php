@@ -75,8 +75,7 @@ try {
             }
         }
         
-        // For debugging, let's allow access temporarily
-        $has_access = true; // TEMPORARY DEBUG - REMOVE THIS LINE
+        // Access control is now properly implemented
         
         if (!$has_access) {
             $error_message = 'You do not have permission to view this course';
@@ -87,7 +86,7 @@ try {
     // Get course media (with error handling) - moved outside access control
     $course_media = [];
     try {
-        $query = "SELECT * FROM course_media WHERE course_id = :course_id ORDER BY media_type, created_at";
+        $query = "SELECT * FROM course_media WHERE course_id = :course_id ORDER BY media_type, upload_date";
         $stmt = $conn->prepare($query);
         $stmt->bindParam(':course_id', $course_id);
         $stmt->execute();
