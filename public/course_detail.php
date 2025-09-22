@@ -177,12 +177,17 @@ try {
                 });
                 if (!empty($course_video)): 
                     $video = array_values($course_video)[0];
+                    // Fix file path - remove ../ prefix if it exists
+                    $video_path = $video['file_path'];
+                    if (strpos($video_path, '../') === 0) {
+                        $video_path = substr($video_path, 3);
+                    }
                 ?>
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <h2 class="text-lg font-semibold text-gray-900 mb-4">Course Video</h2>
                         <div class="relative">
                             <video class="w-full rounded-lg shadow-lg" controls poster="" preload="metadata">
-                                <source src="file_viewer.php?file=<?php echo urlencode($video['file_path']); ?>" type="<?php echo htmlspecialchars($video['file_type']); ?>">
+                                <source src="file_viewer.php?file=<?php echo urlencode($video_path); ?>" type="<?php echo htmlspecialchars($video['file_type']); ?>">
                                 Your browser does not support the video tag.
                             </video>
                             <div class="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">

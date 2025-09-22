@@ -172,8 +172,14 @@ try {
                             <?php foreach($featured_courses as $course): ?>
                             <div class="flex-shrink-0 w-80 bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onclick="window.location.href='course_detail.php?id=<?php echo $course['id']; ?>'">
                                 <div class="h-48 relative overflow-hidden">
-                                    <?php if (!empty($course['cover_image']) && file_exists($course['cover_image'])): ?>
-                                        <img src="file_viewer.php?file=<?php echo urlencode($course['cover_image']); ?>" 
+                                    <?php if (!empty($course['cover_image'])): 
+                                        // Fix file path - remove ../ prefix if it exists
+                                        $cover_path = $course['cover_image'];
+                                        if (strpos($cover_path, '../') === 0) {
+                                            $cover_path = substr($cover_path, 3);
+                                        }
+                                        if (file_exists($cover_path)): ?>
+                                        <img src="file_viewer.php?file=<?php echo urlencode($cover_path); ?>" 
                                              alt="<?php echo htmlspecialchars($course['title']); ?>" 
                                              class="w-full h-full object-cover">
                                     <?php else: ?>

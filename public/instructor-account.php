@@ -380,8 +380,14 @@ $recent_enrollments = $stmt->fetchAll();
                         <?php foreach($recent_courses as $course): ?>
                         <div class="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer" onclick="window.location.href='course_detail.php?id=<?php echo $course['id']; ?>'">
                             <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                                <?php if (!empty($course['cover_image']) && file_exists($course['cover_image'])): ?>
-                                    <img src="file_viewer.php?file=<?php echo urlencode($course['cover_image']); ?>" 
+                                <?php if (!empty($course['cover_image'])): 
+                                    // Fix file path - remove ../ prefix if it exists
+                                    $cover_path = $course['cover_image'];
+                                    if (strpos($cover_path, '../') === 0) {
+                                        $cover_path = substr($cover_path, 3);
+                                    }
+                                    if (file_exists($cover_path)): ?>
+                                    <img src="file_viewer.php?file=<?php echo urlencode($cover_path); ?>" 
                                          alt="<?php echo htmlspecialchars($course['title']); ?>" 
                                          class="w-full h-full object-cover">
                                 <?php else: ?>
